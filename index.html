@@ -65,14 +65,15 @@ if(z>=0)h+='<div class=g>'+it.z.map((x,i)=>`<label><input type=radio name=z ${i=
 if(it.a&&it.a.length)h+='<h3>إضافات</h3><div class=g>'+it.a.map((x,i)=>`<label><input type=checkbox ${a.includes(i)?'checked':''} onchange="TA(${i})"> ${E(x[0])} +${x[1]} ج.م</label>`).join('')+'</div>';
 h+=`<div class=q><button onclick="cur.q=Math.max(1,cur.q-1);MD()">−</button><b>${q}</b><button onclick="cur.q++;MD()">+</button></div><button class=ad style="width:100%;padding:12px" onclick="AD()">أضف للطلب — ${U(cur)*q} ج.م</button>`;$('#sh').innerHTML=h;$('#ov').hidden=false}
 function TA(i){const k=cur.a.indexOf(i);k<0?cur.a.push(i):cur.a.splice(k,1);MD()}
-function AD(){const{it,q,z,a}=cur;cart.push({id:it.id,n:it.n,z:z>=0?it.z[z][0]:'',a:a.map(i=>it.a[i][0]),u:U(cur),q});CL();CB()}
+function AD(){const{it,q,z,a}=cur;cart.push({id:it.id,g:CG(it.id),n:it.n,z:z>=0?it.z[z][0]:'',a:a.map(i=>it.a[i][0]),u:U(cur),q});CL();CB()}
 const CL=()=>$('#ov').hidden=true,tot=()=>cart.reduce((s,x)=>s+x.u*x.q,0);
 function CB(){const n=cart.reduce((s,x)=>s+x.q,0);$('#cb').hidden=!n;$('#cb').textContent=`أكمل طلبك (${n}) · ${tot()} ج.م`}
 function CS(){$('#sh').innerHTML='<h3>طلبك</h3>'+cart.map((x,i)=>`<div class=ln><span>${E(x.n)} ${E(x.z)} ${E(x.a.join('، '))}</span><span class=q><button onclick="CQ(${i},-1)">−</button><b>${x.q}</b><button onclick="CQ(${i},1)">+</button></span><span>${x.u*x.q}</span></div>`).join('')+`<h3>الإجمالي: ${tot()} ج.م</h3><button class=ad style="width:100%;padding:12px" onclick="SD()">إرسال الطلب على واتساب</button>`;$('#ov').hidden=false}
 function CQ(i,d){cart[i].q+=d;if(cart[i].q<1)cart.splice(i,1);CB();cart.length?CS():CL()}
 function OW(u){const w=open(u,'_blank');if(!w)location.href=u}
 function OO(k){const w=M.w,x=(M.s||[])[k];if(!x)return;let m=w.p+'\n• عرض: '+(x[1]||'العرض')+'\n';if(TB)m+=`${w.l||'طاولة'}: ${TB}\n`;m+=w.s;OW('https://wa.me/'+w.n+'?text='+encodeURIComponent(m))}
-function SD(){const w=M.w;let m=w.p+'\n';cart.forEach(x=>{m+=`• ${x.q}× ${x.n}${x.z?' ('+x.z+')':''}${x.a.length?' + '+x.a.join('، '):''} = ${x.u*x.q} ج.م\n`});m+=`الإجمالي: ${tot()} ج.م\n`;if(TB)m+=`${w.l||'طاولة'}: ${TB}\n`;m+=w.s;
+const CG=id=>{for(const c of M.c)if(c.it.some(i=>i.id==id))return c.n;return ''};
+function SD(){const w=M.w;let m=w.p+'\n';const gs=[];cart.forEach(x=>{const g=x.g||CG(x.id);let o=gs.find(y=>y[0]==g);if(!o)gs.push(o=[g,[]]);o[1].push(x)});gs.forEach(([g,l])=>{m+='\n'+(g?`*${g}*\n`:'');l.forEach(x=>{m+=`• ${x.q}× ${x.n}${x.z?' ('+x.z+')':''}${x.a.length?' + '+x.a.join('، '):''} = ${x.u*x.q} ج.م\n`})});m+='\n';m+=`الإجمالي: ${tot()} ج.م\n`;if(TB)m+=`${w.l||'طاولة'}: ${TB}\n`;m+=w.s;
 if(db)cart.forEach(x=>db.ref('data/stats/'+x.id).transaction(v=>(v||0)+x.q));OW('https://wa.me/'+w.n+'?text='+encodeURIComponent(m))}
 async function LD(f){try{if(!FB.databaseURL)return;if(!db){firebase.initializeApp(FB);db=firebase.database()}
 const t=(await db.ref('data/menu/ts').once('value')).val();if(!f&&t==ts)return;const v=(await db.ref('data/menu').once('value')).val();
