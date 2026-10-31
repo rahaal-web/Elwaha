@@ -12,7 +12,12 @@ details{background:#361507;border-radius:12px;padding:10px;margin:8px 0}details 
 h4{margin:10px 0 2px;font-size:14px;opacity:.85}.r{display:flex;gap:6px;align-items:center;margin:4px 0}.r button{padding:8px 10px}.r img{width:60px;height:60px;object-fit:cover;border-radius:8px}
 .tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}.tc{background:#F3E7D3;color:#270E02;border-radius:12px;padding:10px;text-align:center}.tc img{width:100%}.tc a{color:#A8581F}
 @media print{.hd,nav,#sq,button{display:none}body{background:#fff}}
-h2,h3{color:#E0A458}.hd{border-bottom:2px solid #A8581F}details{border-right:4px solid #C47A38}button:hover{background:#C47A38}nav button.on{background:#C47A38;color:#270E02}</style></head><body>
+h2,h3{color:#E0A458}.hd{border-bottom:2px solid #A8581F}details{border-right:4px solid #C47A38}button:hover{background:#C47A38}nav button.on{background:#C47A38;color:#270E02}
+summary{display:flex;align-items:center;gap:6px;list-style:none}summary::-webkit-details-marker{display:none}summary::before{content:"◀";font-size:12px;color:#E0A458}details[open]>summary::before{content:"▼"}
+summary .sn{flex:1;min-width:0}summary button{padding:6px 10px;margin:0;font-size:15px}summary small{opacity:.7;font-weight:400}
+em{font-style:normal;background:#6b2f0f;color:#F3E7D3;border-radius:8px;padding:0 8px;font-size:12px;margin-right:4px}
+details.hid>summary .sn{opacity:.45;text-decoration:line-through}details.hid>summary button:last-of-type{background:#6b2f0f}
+</style></head><body>
 <div id="lg"><h2>لوحة تحكم واحة العمدة</h2><input id="em" type="email" placeholder="الإيميل" autocomplete="username"><input id="pw" type="password" placeholder="الباسورد" autocomplete="current-password"><button onclick="LI()">دخول</button><p id="er"></p></div>
 <div id="ap" hidden><div class="hd"><b>واحة العمدة</b><span id="st" hidden>⚠️ فيه تعديلات لسه متنشرتش</span><button onclick="PB()">🚀 نشر على الموقع</button><button onclick="au.signOut()">خروج</button></div>
 <nav id="tabs"></nav><input id="sq" placeholder="🔍 بحث في الأصناف" oninput="q=this.value;H()"><div id="bd"></div></div>
@@ -27,18 +32,22 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 let dirty=0;const D=()=>{dirty=1;$('#st').hidden=false};onbeforeunload=e=>{if(dirty)e.preventDefault()};
 au.onAuthStateChanged(u=>{$('#lg').hidden=!!u;$('#ap').hidden=!u;if(u)LD()});
 function LI(){$('#er').textContent='';au.signInWithEmailAndPassword($('#em').value,$('#pw').value).catch(e=>$('#er').textContent=({'auth/invalid-credential':'الإيميل أو الباسورد غلط','auth/invalid-email':'الإيميل مكتوب غلط','auth/too-many-requests':'محاولات كتير، جرب بعد شوية','auth/network-request-failed':'مفيش اتصال بالنت'})[e.code]||'حصل خطأ، حاول تاني')}
-async function LD(){const v=(await db.ref('data/menu').once('value')).val()||{};if(v.json){M=JSON.parse(v.json);IMG=v.img||{};RM=Object.keys(IMG)}else{M=JSON.parse(JSON.stringify(DEF));dirty=0;D()}TT_();H()}
+async function LD(){const v=(await db.ref('data/menu').once('value')).val()||{};if(v.json){M=JSON.parse(v.json);IMG=v.img||{};RM=Object.keys(IMG)}else{M=JSON.parse(JSON.stringify(DEF));dirty=0;D()}M.c.forEach(c=>{if(!c.id)c.id=uid()});OPC.clear();TT_();H()}
 function TT_(){$('#tabs').innerHTML=TABS.map(t=>`<button class="${t[0]==tab?'on':''}" onclick="tab='${t[0]}';TT_();H()">${t[1]}</button>`).join('')}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 function cr(file,size,cb){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;const s=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,size,size);cb(c.toDataURL('image/webp',.82))};im.src=URL.createObjectURL(file)}
 function H(){$('#sq').hidden=tab!='i';if(tab=='s')return TS();$('#bd').innerHTML={i:TI,b:TBn,o:TO,t:TT}[tab]()}
 const S=(c,i,k,v)=>{M.c[c].it[i][k]=v;D()},PL=v=>v.split('\n').map(l=>l.split(':')).filter(x=>x.length>1&&x[0].trim()&&!isNaN(+x[1])).map(x=>[x[0].trim(),+x[1]]);
-const OPN=new Set();
+const OPN=new Set(),OPC=new Set();
+function TG(el,id){if(q)return;if(el.open){document.querySelectorAll('details.cat').forEach(d=>{if(d!==el&&d.open)d.open=false});OPC.clear();OPC.add(id)}else OPC.delete(id)}
+function KP(id){setTimeout(()=>{const e=document.querySelector('[data-id="'+id+'"]');if(e)e.scrollIntoView({block:'center'})},0)}
+function HC(c){const x=M.c[c];x.h=x.h?0:1;D();H()}
+function HI(c,i){const x=M.c[c].it[i];x.h=x.h?0:1;D();H()}
 const LR=(it,c,i,k,ph)=>(it[k]||[]).map((x,j)=>`<div class=r><input value="${E(x[0])}" placeholder="${ph}" oninput="LS(${c},${i},'${k}',${j},0,this.value)"><input type=number value="${x[1]}" placeholder="السعر" style="max-width:110px" oninput="LS(${c},${i},'${k}',${j},1,this.value)"><button onclick="LX(${c},${i},'${k}',${j})">🗑</button></div>`).join('');
 function LS(c,i,k,j,n,v){M.c[c].it[i][k][j][n]=n?+v:v;D()}
 function LA(c,i,k){const it=M.c[c].it[i];(it[k]=it[k]||[]).push(['',0]);D();H()}
 function LX(c,i,k,j){M.c[c].it[i][k].splice(j,1);D();H()}
-function IT(it,c,i){const o=it.o||[0,''];return `<details ${OPN.has(it.id)?'open':''} ontoggle="this.open?OPN.add('${it.id}'):OPN.delete('${it.id}')"><summary>${E(it.n)} — ${it.p}</summary>
+function IT(it,c,i){const o=it.o||[0,''];return `<details data-id="${it.id}" class="${it.h?'hid':''}" ${OPN.has(it.id)?'open':''} ontoggle="this.open?OPN.add('${it.id}'):OPN.delete('${it.id}')"><summary><span class=sn>${E(it.n)} — ${it.p}${it.h?' <em>مخفي</em>':''}</span><button onclick="event.preventDefault();MU(${c},${i},-1)">↑</button><button onclick="event.preventDefault();MU(${c},${i},1)">↓</button><button onclick="event.preventDefault();HI(${c},${i})">${it.h?'🙈':'👁'}</button></summary>
 <input value="${E(it.n)}" placeholder="الاسم" oninput="S(${c},${i},'n',this.value)"><input value="${E(it.d)}" placeholder="الوصف" oninput="S(${c},${i},'d',this.value)"><input type=number value="${it.p}" placeholder="السعر" oninput="S(${c},${i},'p',+this.value)">
 <select onchange="S(${c},${i},'t',this.value)">${TY.map(t=>`<option value=${t[0]} ${t[0]==it.t?'selected':''}>${t[1]}</option>`).join('')}</select>
 <select onchange="S(${c},${i},'f',this.value)"><option value="">عادي</option><option value=new ${it.f=='new'?'selected':''}>جديد</option><option value=out ${it.f=='out'?'selected':''}>نفد</option></select>
@@ -46,13 +55,13 @@ function IT(it,c,i){const o=it.o||[0,''];return `<details ${OPN.has(it.id)?'open
 <h4>الأحجام</h4>${LR(it,c,i,'z','اسم الحجم (مثال: كبير)')}<button onclick="LA(${c},${i},'z')">+ إضافة حجم</button>
 <h4>الإضافات</h4>${LR(it,c,i,'a','اسم الإضافة (مثال: صوص إضافي)')}<button onclick="LA(${c},${i},'a')">+ إضافة</button>
 <div class=r>${IMG[it.i]?`<img src="${IMG[it.i]}">`:''}<input type=file accept="image/*" onchange="UP(this,${c},${i})"></div>
-<div class=r><select onchange="MI(${c},${i},+this.value)">${M.c.map((x,k)=>`<option value=${k} ${k==c?'selected':''}>نقل إلى: ${E(x.n)}</option>`).join('')}</select><button onclick="MU(${c},${i},-1)">↑</button><button onclick="MU(${c},${i},1)">↓</button><button onclick="CP(${c},${i})">نسخ</button><button onclick="DI(${c},${i})">🗑</button></div></details>`}
-function TI(){return `<div class=r><button onclick="PC()">% تعديل كل الأسعار</button><button onclick="M.c.push({n:'قسم جديد',it:[]});D();H()">+ قسم</button></div>`+M.c.map((c,ci)=>`<details open><summary>${E(c.n)}</summary><div class=r><input value="${E(c.n)}" oninput="M.c[${ci}].n=this.value;D()"><button onclick="MC(${ci},-1)">↑</button><button onclick="MC(${ci},1)">↓</button><button onclick="DC(${ci})">🗑</button></div>${c.it.map((it,ii)=>q&&!it.n.includes(q)?'':IT(it,ci,ii)).join('')}<button onclick="AI(${ci})">+ صنف</button></details>`).join('')}
+<div class=r><select onchange="MI(${c},${i},+this.value)">${M.c.map((x,k)=>`<option value=${k} ${k==c?'selected':''}>نقل إلى: ${E(x.n)}</option>`).join('')}</select><button onclick="CP(${c},${i})">نسخ</button><button onclick="DI(${c},${i})">🗑</button></div></details>`}
+function TI(){return `<div class=r><button onclick="PC()">% تعديل كل الأسعار</button><button onclick="const id=uid();M.c.push({id,n:'قسم جديد',it:[]});OPC.clear();OPC.add(id);D();H();KP(id)">+ قسم</button></div>`+M.c.map((c,ci)=>{const its=c.it.map((it,ii)=>q&&!it.n.includes(q)?'':IT(it,ci,ii)).join('');if(q&&!its)return '';const hn=c.it.filter(x=>x.h).length;return `<details data-id="${c.id}" class="cat ${c.h?'hid':''}" ${q||OPC.has(c.id)?'open':''} ontoggle="TG(this,'${c.id}')"><summary><span class=sn>${E(c.n)} <small>(${c.it.length}${hn?' · '+hn+' مخفي':''})</small>${c.h?' <em>مخفي</em>':''}</span><button onclick="event.preventDefault();MC(${ci},-1)">↑</button><button onclick="event.preventDefault();MC(${ci},1)">↓</button><button onclick="event.preventDefault();HC(${ci})">${c.h?'🙈':'👁'}</button></summary><div class=r><input value="${E(c.n)}" oninput="M.c[${ci}].n=this.value;D()"><button onclick="DC(${ci})">🗑</button></div>${its}<button onclick="AI(${ci})">+ صنف</button></details>`}).join('')}
 function OF(c,i,k,v){const it=M.c[c].it[i];it.o=it.o||[0,''];it.o[k]=k?v:+v;D()}
 function UP(el,c,i){const f=el.files[0];if(!f)return;cr(f,480,d=>{const k='i'+uid();IMG[k]=d;M.c[c].it[i].i=k;D();H()})}
 function MI(c,i,t){const [it]=M.c[c].it.splice(i,1);M.c[t].it.push(it);D();H()}
-function MU(c,i,d){const a=M.c[c].it,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];D();H()}
-function MC(i,d){const j=i+d;if(j<0||j>=M.c.length)return;[M.c[i],M.c[j]]=[M.c[j],M.c[i]];D();H()}
+function MU(c,i,d){const a=M.c[c].it,j=i+d;if(j<0||j>=a.length)return;const id=a[i].id;[a[i],a[j]]=[a[j],a[i]];D();H();KP(id)}
+function MC(i,d){const j=i+d;if(j<0||j>=M.c.length)return;const id=M.c[i].id;[M.c[i],M.c[j]]=[M.c[j],M.c[i]];D();H();KP(id)}
 function CP(c,i){const n=JSON.parse(JSON.stringify(M.c[c].it[i]));n.id=uid();n.n+=' (نسخة)';M.c[c].it.splice(i+1,0,n);D();H()}
 function DI(c,i){if(confirm('حذف الصنف؟')){M.c[c].it.splice(i,1);D();H()}}
 function DC(c){if(confirm('حذف القسم بكل أصنافه؟')){M.c.splice(c,1);D();H()}}
