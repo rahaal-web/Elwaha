@@ -9,7 +9,7 @@ button{width:auto;background:#6C151E;border:0;padding:8px 14px;cursor:pointer}te
 .hd{position:sticky;top:0;background:#1E1410;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 0;z-index:5}.hd b{font-family:Rakkas;font-size:20px;flex:1}#st{color:#e9b44c;font-size:13px}
 nav{display:flex;gap:6px;overflow-x:auto}nav button.on{background:#F5DABF;color:#1E1410}
 details{background:#2d201a;border-radius:12px;padding:10px;margin:8px 0}details details{background:#1E1410}summary{cursor:pointer;font-weight:700}
-.r{display:flex;gap:6px;align-items:center;margin:4px 0}.r button{padding:8px 10px}.r img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+h4{margin:10px 0 2px;font-size:14px;opacity:.85}.r{display:flex;gap:6px;align-items:center;margin:4px 0}.r button{padding:8px 10px}.r img{width:60px;height:60px;object-fit:cover;border-radius:8px}
 .tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}.tc{background:#F5DABF;color:#1E1410;border-radius:12px;padding:10px;text-align:center}.tc img{width:100%}.tc a{color:#6C151E}
 @media print{.hd,nav,#sq,button{display:none}body{background:#fff}}
 </style></head><body>
@@ -33,13 +33,18 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 function cr(file,size,cb){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;const s=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,size,size);cb(c.toDataURL('image/webp',.82))};im.src=URL.createObjectURL(file)}
 function H(){$('#sq').hidden=tab!='i';if(tab=='s')return TS();$('#bd').innerHTML={i:TI,b:TBn,o:TO,t:TT}[tab]()}
 const S=(c,i,k,v)=>{M.c[c].it[i][k]=v;D()},PL=v=>v.split('\n').map(l=>l.split(':')).filter(x=>x.length>1&&x[0].trim()&&!isNaN(+x[1])).map(x=>[x[0].trim(),+x[1]]);
-function IT(it,c,i){const o=it.o||[0,''];return `<details><summary>${E(it.n)} — ${it.p}</summary>
+const OPN=new Set();
+const LR=(it,c,i,k,ph)=>(it[k]||[]).map((x,j)=>`<div class=r><input value="${E(x[0])}" placeholder="${ph}" oninput="LS(${c},${i},'${k}',${j},0,this.value)"><input type=number value="${x[1]}" placeholder="السعر" style="max-width:110px" oninput="LS(${c},${i},'${k}',${j},1,this.value)"><button onclick="LX(${c},${i},'${k}',${j})">🗑</button></div>`).join('');
+function LS(c,i,k,j,n,v){M.c[c].it[i][k][j][n]=n?+v:v;D()}
+function LA(c,i,k){const it=M.c[c].it[i];(it[k]=it[k]||[]).push(['',0]);D();H()}
+function LX(c,i,k,j){M.c[c].it[i][k].splice(j,1);D();H()}
+function IT(it,c,i){const o=it.o||[0,''];return `<details ${OPN.has(it.id)?'open':''} ontoggle="this.open?OPN.add('${it.id}'):OPN.delete('${it.id}')"><summary>${E(it.n)} — ${it.p}</summary>
 <input value="${E(it.n)}" placeholder="الاسم" oninput="S(${c},${i},'n',this.value)"><input value="${E(it.d)}" placeholder="الوصف" oninput="S(${c},${i},'d',this.value)"><input type=number value="${it.p}" placeholder="السعر" oninput="S(${c},${i},'p',+this.value)">
 <select onchange="S(${c},${i},'t',this.value)">${TY.map(t=>`<option value=${t[0]} ${t[0]==it.t?'selected':''}>${t[1]}</option>`).join('')}</select>
 <select onchange="S(${c},${i},'f',this.value)"><option value="">عادي</option><option value=new ${it.f=='new'?'selected':''}>جديد</option><option value=out ${it.f=='out'?'selected':''}>نفد</option></select>
 <div class=r><input type=number placeholder="سعر العرض" value="${o[0]||''}" oninput="OF(${c},${i},0,this.value)"><input type=date value="${o[1]}" oninput="OF(${c},${i},1,this.value)"></div>
-<textarea placeholder="الأحجام: سطر لكل حجم، مثال  كبير:70" oninput="S(${c},${i},'z',PL(this.value))">${(it.z||[]).map(z=>z.join(':')).join('\n')}</textarea>
-<textarea placeholder="الإضافات: سطر لكل إضافة، مثال  صوص:10" oninput="S(${c},${i},'a',PL(this.value))">${(it.a||[]).map(z=>z.join(':')).join('\n')}</textarea>
+<h4>الأحجام</h4>${LR(it,c,i,'z','اسم الحجم (مثال: كبير)')}<button onclick="LA(${c},${i},'z')">+ إضافة حجم</button>
+<h4>الإضافات</h4>${LR(it,c,i,'a','اسم الإضافة (مثال: صوص إضافي)')}<button onclick="LA(${c},${i},'a')">+ إضافة</button>
 <div class=r>${IMG[it.i]?`<img src="${IMG[it.i]}">`:''}<input type=file accept="image/*" onchange="UP(this,${c},${i})"></div>
 <div class=r><select onchange="MI(${c},${i},+this.value)">${M.c.map((x,k)=>`<option value=${k} ${k==c?'selected':''}>نقل إلى: ${E(x.n)}</option>`).join('')}</select><button onclick="MU(${c},${i},-1)">↑</button><button onclick="MU(${c},${i},1)">↓</button><button onclick="CP(${c},${i})">نسخ</button><button onclick="DI(${c},${i})">🗑</button></div></details>`}
 function TI(){return `<div class=r><button onclick="PC()">% تعديل كل الأسعار</button><button onclick="M.c.push({n:'قسم جديد',it:[]});D();H()">+ قسم</button></div>`+M.c.map((c,ci)=>`<details open><summary>${E(c.n)}</summary><div class=r><input value="${E(c.n)}" oninput="M.c[${ci}].n=this.value;D()"><button onclick="MC(${ci},-1)">↑</button><button onclick="MC(${ci},1)">↓</button><button onclick="DC(${ci})">🗑</button></div>${c.it.map((it,ii)=>q&&!it.n.includes(q)?'':IT(it,ci,ii)).join('')}<button onclick="AI(${ci})">+ صنف</button></details>`).join('')}
@@ -59,7 +64,7 @@ function SM(i,d){const j=i+d;if(j<0||j>=M.s.length)return;[M.s[i],M.s[j]]=[M.s[j
 function TO(){const w=M.w;return `<label>رقم الواتساب (بكود الدولة)</label><input value="${E(w.n)}" onchange="w=M.w;w.n=this.value.replace(/\\D/g,'');if(w.n[0]=='0')w.n='20'+w.n.slice(1);D();H()"><label>جملة بداية الرسالة</label><input value="${E(w.p)}" oninput="M.w.p=this.value;D()"><label>السطر الختامي</label><input value="${E(w.s)}" oninput="M.w.s=this.value;D()"><label>اسم الطاولة</label><input value="${E(w.l)}" oninput="M.w.l=this.value;D()"><label>عدد الطاولات (1 - 60)</label><input type=number min=1 max=60 value="${w.t}" oninput="M.w.t=Math.min(60,+this.value||0);D()"><h3>معاينة الرسالة</h3><pre style="white-space:pre-wrap">${E(w.p)}\n• 2× وافل سادة = 100 ج.م\nالإجمالي: 100 ج.م\n${E(w.l)}: 7\n${E(w.s)}</pre>`}
 function TT(){const b=location.href.replace(/admin\.html.*$/,'').replace(/[?#].*$/,'')+'index.html';let h='<button onclick="print()">🖨 طباعة الكل</button><div class=tg>';for(let i=1;i<=(M.w.t||0);i++){const k=qrcode(0,'M');k.addData(b+'?t='+i);k.make();const u=k.createDataURL(8);h+=`<div class=tc><img src="${u}"><b>${E(M.w.l)} ${i}</b><br><a download="table-${i}.png" href="${u}">تحميل</a></div>`}return h+'</div>'}
 function TS(){$('#bd').textContent='جاري التحميل...';db.ref('data/stats').once('value').then(s=>{const v=s.val()||{},nm={};M.c.forEach(c=>c.it.forEach(i=>nm[i.id]=i.n));$('#bd').innerHTML='<h3>عدد مرات طلب كل صنف</h3>'+(Object.keys(v).sort((a,b)=>v[b]-v[a]).map(k=>`<div class=r><span style="flex:1">${E(nm[k]||k)}</span><b>${v[k]}</b></div>`).join('')||'لسه مفيش طلبات')})}
-async function PB(){if(!confirm('نشر التعديلات على الموقع؟'))return;try{const used=new Set([...M.c.flatMap(c=>c.it.map(i=>i.i)),...M.s.map(s=>s[0])].filter(k=>k&&IMG[k])),u={};
+async function PB(){if(!confirm('نشر التعديلات على الموقع؟'))return;try{M.c.forEach(c=>c.it.forEach(it=>['z','a'].forEach(k=>{if(it[k])it[k]=it[k].filter(x=>x[0].trim())})));const used=new Set([...M.c.flatMap(c=>c.it.map(i=>i.i)),...M.s.map(s=>s[0])].filter(k=>k&&IMG[k])),u={};
 for(const k of used)if(!RM.includes(k))u['data/menu/img/'+k]=IMG[k];for(const k of RM)if(!used.has(k))u['data/menu/img/'+k]=null;
-u['data/menu/json']=JSON.stringify(M);u['data/menu/ts']=Date.now();await db.ref().update(u);RM=[...used];dirty=0;$('#st').hidden=true;alert('تم النشر ✅')}catch(e){alert('فشل النشر: '+e.message)}}
+u['data/menu/json']=JSON.stringify(M);u['data/menu/ts']=Date.now();await db.ref().update(u);RM=[...used];dirty=0;$('#st').hidden=true;H();alert('تم النشر ✅')}catch(e){alert('فشل النشر: '+e.message)}}
 </script></body></html>
