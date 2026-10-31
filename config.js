@@ -1,6 +1,7 @@
 // ضع إعدادات Firebase هنا (Project settings > Your apps > firebaseConfig)
 const FB={apiKey:"AIzaSyAd4TuhV8eFo1fyPg3VYQbsRXkmGxy1A_U",authDomain:"waha-v2.firebaseapp.com",databaseURL:"https://waha-v2-default-rtdb.firebaseio.com",projectId:"waha-v2",storageBucket:"waha-v2.firebasestorage.app",messagingSenderId:"199279065210",appId:"1:199279065210:web:b473a6af08087fa7afe3c3"};
-const CREDIT="تصميم: رحال برودكشن";
+const CREDIT="تصميم: احمد رحال";
+const CREDIT_URL="https://www.facebook.com/share/1S1NZEeJhm/";
 const WA=[["صوص إضافي",10],["آيس كريم",15]];
 const DEF={c:[
 {n:"وافل",it:[{id:"w1",n:"وافل سادة",d:"",p:50,t:"waffle",a:WA},{id:"w2",n:"وافل شوكولاتة",d:"",p:70,t:"waffle",a:WA},{id:"w3",n:"وافل فواكه",d:"",p:80,t:"waffle",a:WA}]},
