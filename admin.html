@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#1E1410"><title>لوحة تحكم واحة العمدة</title><link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Rakkas&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}[hidden]{display:none!important}
+body{background:#1E1410;color:#F5DABF;font-family:Cairo,sans-serif;max-width:720px;margin:auto;padding:env(safe-area-inset-top) 10px 40px}
+input,select,textarea,button{font:inherit;border-radius:10px;border:1px solid #F5DABF66;background:#2d201a;color:#F5DABF;padding:8px;width:100%;margin:3px 0}
+button{width:auto;background:#6C151E;border:0;padding:8px 14px;cursor:pointer}textarea{min-height:60px}
+#lg{padding:60px 10px;display:grid;gap:8px}h2,h3{font-family:Rakkas;font-weight:400}#er{color:#e07a8a}
+.hd{position:sticky;top:0;background:#1E1410;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 0;z-index:5}.hd b{font-family:Rakkas;font-size:20px;flex:1}#st{color:#e9b44c;font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto}nav button.on{background:#F5DABF;color:#1E1410}
+details{background:#2d201a;border-radius:12px;padding:10px;margin:8px 0}details details{background:#1E1410}summary{cursor:pointer;font-weight:700}
+.r{display:flex;gap:6px;align-items:center;margin:4px 0}.r button{padding:8px 10px}.r img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}.tc{background:#F5DABF;color:#1E1410;border-radius:12px;padding:10px;text-align:center}.tc img{width:100%}.tc a{color:#6C151E}
+@media print{.hd,nav,#sq,button{display:none}body{background:#fff}}
+</style></head><body>
+<div id="lg"><h2>لوحة تحكم واحة العمدة</h2><input id="em" type="email" placeholder="الإيميل" autocomplete="username"><input id="pw" type="password" placeholder="الباسورد" autocomplete="current-password"><button onclick="LI()">دخول</button><p id="er"></p></div>
+<div id="ap" hidden><div class="hd"><b>واحة العمدة</b><span id="st" hidden>⚠️ فيه تعديلات لسه متنشرتش</span><button onclick="PB()">🚀 نشر على الموقع</button><button onclick="au.signOut()">خروج</button></div>
+<nav id="tabs"></nav><input id="sq" placeholder="🔍 بحث في الأصناف" oninput="q=this.value;H()"><div id="bd"></div></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script><script src="config.js"></script>
+<script>
+firebase.initializeApp(FB);const au=firebase.auth(),db=firebase.database();
+let M=DEF,IMG={},RM=[],tab='i',q='';
+const $=s=>document.querySelector(s),E=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TY=[['waffle','وافل 🧇'],['mug','كوب ☕'],['tea','شاي 🍵'],['ice','بتلج 🧊'],['shake','ميلك شيك 🥤'],['juice','عصير 🧃']],TABS=[['i','الأصناف'],['b','البانر'],['o','الطلب'],['t','الطاولات'],['s','الإحصائيات']];
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+let dirty=0;const D=()=>{dirty=1;$('#st').hidden=false};onbeforeunload=e=>{if(dirty)e.preventDefault()};
+au.onAuthStateChanged(u=>{$('#lg').hidden=!!u;$('#ap').hidden=!u;if(u)LD()});
+function LI(){$('#er').textContent='';au.signInWithEmailAndPassword($('#em').value,$('#pw').value).catch(e=>$('#er').textContent=({'auth/invalid-credential':'الإيميل أو الباسورد غلط','auth/invalid-email':'الإيميل مكتوب غلط','auth/too-many-requests':'محاولات كتير، جرب بعد شوية','auth/network-request-failed':'مفيش اتصال بالنت'})[e.code]||'حصل خطأ، حاول تاني')}
+async function LD(){const v=(await db.ref('data/menu').once('value')).val()||{};if(v.json){M=JSON.parse(v.json);IMG=v.img||{};RM=Object.keys(IMG)}else{M=JSON.parse(JSON.stringify(DEF));dirty=0;D()}TT_();H()}
+function TT_(){$('#tabs').innerHTML=TABS.map(t=>`<button class="${t[0]==tab?'on':''}" onclick="tab='${t[0]}';TT_();H()">${t[1]}</button>`).join('')}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function cr(file,size,cb){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;const s=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,size,size);cb(c.toDataURL('image/webp',.82))};im.src=URL.createObjectURL(file)}
+function H(){$('#sq').hidden=tab!='i';if(tab=='s')return TS();$('#bd').innerHTML={i:TI,b:TBn,o:TO,t:TT}[tab]()}
+const S=(c,i,k,v)=>{M.c[c].it[i][k]=v;D()},PL=v=>v.split('\n').map(l=>l.split(':')).filter(x=>x.length>1&&x[0].trim()&&!isNaN(+x[1])).map(x=>[x[0].trim(),+x[1]]);
+function IT(it,c,i){const o=it.o||[0,''];return `<details><summary>${E(it.n)} — ${it.p}</summary>
+<input value="${E(it.n)}" placeholder="الاسم" oninput="S(${c},${i},'n',this.value)"><input value="${E(it.d)}" placeholder="الوصف" oninput="S(${c},${i},'d',this.value)"><input type=number value="${it.p}" placeholder="السعر" oninput="S(${c},${i},'p',+this.value)">
+<select onchange="S(${c},${i},'t',this.value)">${TY.map(t=>`<option value=${t[0]} ${t[0]==it.t?'selected':''}>${t[1]}</option>`).join('')}</select>
+<select onchange="S(${c},${i},'f',this.value)"><option value="">عادي</option><option value=new ${it.f=='new'?'selected':''}>جديد</option><option value=out ${it.f=='out'?'selected':''}>نفد</option></select>
+<div class=r><input type=number placeholder="سعر العرض" value="${o[0]||''}" oninput="OF(${c},${i},0,this.value)"><input type=date value="${o[1]}" oninput="OF(${c},${i},1,this.value)"></div>
+<textarea placeholder="الأحجام: سطر لكل حجم، مثال  كبير:70" oninput="S(${c},${i},'z',PL(this.value))">${(it.z||[]).map(z=>z.join(':')).join('\n')}</textarea>
+<textarea placeholder="الإضافات: سطر لكل إضافة، مثال  صوص:10" oninput="S(${c},${i},'a',PL(this.value))">${(it.a||[]).map(z=>z.join(':')).join('\n')}</textarea>
+<div class=r>${IMG[it.i]?`<img src="${IMG[it.i]}">`:''}<input type=file accept="image/*" onchange="UP(this,${c},${i})"></div>
+<div class=r><select onchange="MI(${c},${i},+this.value)">${M.c.map((x,k)=>`<option value=${k} ${k==c?'selected':''}>نقل إلى: ${E(x.n)}</option>`).join('')}</select><button onclick="MU(${c},${i},-1)">↑</button><button onclick="MU(${c},${i},1)">↓</button><button onclick="CP(${c},${i})">نسخ</button><button onclick="DI(${c},${i})">🗑</button></div></details>`}
+function TI(){return `<div class=r><button onclick="PC()">% تعديل كل الأسعار</button><button onclick="M.c.push({n:'قسم جديد',it:[]});D();H()">+ قسم</button></div>`+M.c.map((c,ci)=>`<details open><summary>${E(c.n)}</summary><div class=r><input value="${E(c.n)}" oninput="M.c[${ci}].n=this.value;D()"><button onclick="MC(${ci},-1)">↑</button><button onclick="MC(${ci},1)">↓</button><button onclick="DC(${ci})">🗑</button></div>${c.it.map((it,ii)=>q&&!it.n.includes(q)?'':IT(it,ci,ii)).join('')}<button onclick="AI(${ci})">+ صنف</button></details>`).join('')}
+function OF(c,i,k,v){const it=M.c[c].it[i];it.o=it.o||[0,''];it.o[k]=k?v:+v;D()}
+function UP(el,c,i){const f=el.files[0];if(!f)return;cr(f,480,d=>{const k='i'+uid();IMG[k]=d;M.c[c].it[i].i=k;D();H()})}
+function MI(c,i,t){const [it]=M.c[c].it.splice(i,1);M.c[t].it.push(it);D();H()}
+function MU(c,i,d){const a=M.c[c].it,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];D();H()}
+function MC(i,d){const j=i+d;if(j<0||j>=M.c.length)return;[M.c[i],M.c[j]]=[M.c[j],M.c[i]];D();H()}
+function CP(c,i){const n=JSON.parse(JSON.stringify(M.c[c].it[i]));n.id=uid();n.n+=' (نسخة)';M.c[c].it.splice(i+1,0,n);D();H()}
+function DI(c,i){if(confirm('حذف الصنف؟')){M.c[c].it.splice(i,1);D();H()}}
+function DC(c){if(confirm('حذف القسم بكل أصنافه؟')){M.c.splice(c,1);D();H()}}
+function AI(c){M.c[c].it.push({id:uid(),n:'صنف جديد',d:'',p:0,t:'mug'});D();H()}
+function PC(){const p=parseFloat(prompt('نسبة التغيير % (مثال 10 أو -5)'));if(isNaN(p))return;const f=v=>Math.round(v*(1+p/100));M.c.forEach(c=>c.it.forEach(it=>{it.p=f(it.p);(it.z||[]).forEach(z=>z[1]=f(z[1]));(it.a||[]).forEach(z=>z[1]=f(z[1]))}));D();H()}
+function TBn(){return M.s.map((s,i)=>`<div class=r><img src="${IMG[s[0]]||''}"><input value="${E(s[1])}" placeholder="الكلمة على الصورة" oninput="M.s[${i}][1]=this.value;D()"><button onclick="SM(${i},-1)">↑</button><button onclick="SM(${i},1)">↓</button><button onclick="M.s.splice(${i},1);D();H()">🗑</button></div>`).join('')+`<p>إضافة صورة للسلايدر:</p><input type=file accept="image/*" onchange="AB(this)">`}
+function AB(el){const f=el.files[0];if(!f)return;cr(f,800,d=>{const k='b'+uid();IMG[k]=d;M.s.push([k,'']);D();H()})}
+function SM(i,d){const j=i+d;if(j<0||j>=M.s.length)return;[M.s[i],M.s[j]]=[M.s[j],M.s[i]];D();H()}
+function TO(){const w=M.w;return `<label>رقم الواتساب (بكود الدولة)</label><input value="${E(w.n)}" onchange="w=M.w;w.n=this.value.replace(/\\D/g,'');if(w.n[0]=='0')w.n='20'+w.n.slice(1);D();H()"><label>جملة بداية الرسالة</label><input value="${E(w.p)}" oninput="M.w.p=this.value;D()"><label>السطر الختامي</label><input value="${E(w.s)}" oninput="M.w.s=this.value;D()"><label>اسم الطاولة</label><input value="${E(w.l)}" oninput="M.w.l=this.value;D()"><label>عدد الطاولات (1 - 60)</label><input type=number min=1 max=60 value="${w.t}" oninput="M.w.t=Math.min(60,+this.value||0);D()"><h3>معاينة الرسالة</h3><pre style="white-space:pre-wrap">${E(w.p)}\n• 2× وافل سادة = 100 ج.م\nالإجمالي: 100 ج.م\n${E(w.l)}: 7\n${E(w.s)}</pre>`}
+function TT(){const b=location.href.replace(/admin\.html.*$/,'').replace(/[?#].*$/,'')+'index.html';let h='<button onclick="print()">🖨 طباعة الكل</button><div class=tg>';for(let i=1;i<=(M.w.t||0);i++){const k=qrcode(0,'M');k.addData(b+'?t='+i);k.make();const u=k.createDataURL(8);h+=`<div class=tc><img src="${u}"><b>${E(M.w.l)} ${i}</b><br><a download="table-${i}.png" href="${u}">تحميل</a></div>`}return h+'</div>'}
+function TS(){$('#bd').textContent='جاري التحميل...';db.ref('data/stats').once('value').then(s=>{const v=s.val()||{},nm={};M.c.forEach(c=>c.it.forEach(i=>nm[i.id]=i.n));$('#bd').innerHTML='<h3>عدد مرات طلب كل صنف</h3>'+(Object.keys(v).sort((a,b)=>v[b]-v[a]).map(k=>`<div class=r><span style="flex:1">${E(nm[k]||k)}</span><b>${v[k]}</b></div>`).join('')||'لسه مفيش طلبات')})}
+async function PB(){if(!confirm('نشر التعديلات على الموقع؟'))return;try{const used=new Set([...M.c.flatMap(c=>c.it.map(i=>i.i)),...M.s.map(s=>s[0])].filter(k=>k&&IMG[k])),u={};
+for(const k of used)if(!RM.includes(k))u['data/menu/img/'+k]=IMG[k];for(const k of RM)if(!used.has(k))u['data/menu/img/'+k]=null;
+u['data/menu/json']=JSON.stringify(M);u['data/menu/ts']=Date.now();await db.ref().update(u);RM=[...used];dirty=0;$('#st').hidden=true;alert('تم النشر ✅')}catch(e){alert('فشل النشر: '+e.message)}}
+</script></body></html>
