@@ -73,7 +73,7 @@ function TA(i){const k=cur.a.indexOf(i);k<0?cur.a.push(i):cur.a.splice(k,1);MD()
 function AD(){const{it,q,z,a}=cur;cart.push({id:it.id,g:CG(it.id),n:it.n,z:z>=0?it.z[z][0]:'',a:a.map(i=>it.a[i][0]),u:U(cur),q});CL();CB()}
 const CL=()=>{if(TV&&LO&&OKD&&(LO.st=='done'||LO.st=='cancelled'))LX();TV=0;$('#ov').hidden=true},tot=()=>cart.reduce((s,x)=>s+x.u*x.q,0);
 function CB(){const n=cart.reduce((s,x)=>s+x.q,0);$('#cb').hidden=!n;$('#cb').textContent=`أكمل طلبك (${n}) · ${tot()} ج.م`;TP()}
-function CS(){TV=0;$('#sh').innerHTML='<h3>طلبك</h3>'+cart.map((x,i)=>`<div class=ln><span>${E(x.n)} ${E(x.z)} ${E(x.a.join('، '))}</span><span class=q><button onclick="CQ(${i},-1)">−</button><b>${x.q}</b><button onclick="CQ(${i},1)">+</button></span><span>${x.u*x.q}</span></div>`).join('')+`<h3>الإجمالي: ${tot()} ج.م</h3>${DM()?`<button class=ad style="width:100%;padding:12px" onclick="DF()">📤 إرسال الطلب مباشرة للمطعم</button><button class="ad sc" style="width:100%;padding:12px;margin-top:8px" onclick="SD()">💬 إرسال على واتساب</button>`:`<button class=ad style="width:100%;padding:12px" onclick="SD()">إرسال الطلب على واتساب</button>`}`;$('#ov').hidden=false}
+function CS(){TV=0;$('#sh').innerHTML='<h3>طلبك</h3>'+cart.map((x,i)=>`<div class=ln><span>${E(x.n)} ${E(x.z)} ${E(x.a.join('، '))}</span><span class=q><button onclick="CQ(${i},-1)">−</button><b>${x.q}</b><button onclick="CQ(${i},1)">+</button></span><span>${x.u*x.q}</span></div>`).join('')+`<h3>الإجمالي: ${tot()} ج.م</h3>${DM()?`<button class=ad style="width:100%;padding:12px" onclick="DS()">📤 إرسال الطلب مباشرة للمطعم</button><button class="ad sc" style="width:100%;padding:12px;margin-top:8px" onclick="SD()">💬 إرسال على واتساب</button>`:`<button class=ad style="width:100%;padding:12px" onclick="SD()">إرسال الطلب على واتساب</button>`}`;$('#ov').hidden=false}
 function CQ(i,d){cart[i].q+=d;if(cart[i].q<1)cart.splice(i,1);CB();cart.length?CS():CL()}
 function OW(u){const w=open(u,'_blank');if(!w)location.href=u}
 function OO(k){const w=M.w,x=(M.s||[])[k];if(!x)return;let m=w.p+'\n• عرض: '+(x[1]||'العرض')+'\n';if(TB)m+=`${w.l||'طاولة'}: ${TB}\n`;m+=w.s;OW('https://wa.me/'+w.n+'?text='+encodeURIComponent(m))}
@@ -88,18 +88,19 @@ const LB=()=>!OKD?['📡','جاري إرسال الطلب...','لو النت ض�
 function DBI(){try{if(!FB.databaseURL)return null;if(!db){if(!firebase.apps.length)firebase.initializeApp(FB);db=firebase.database()}return db}catch(e){return null}}
 function DF(err){let c={};try{c=JSON.parse(localStorage.wc||'{}')}catch(x){}
 $('#sh').innerHTML=`<button class=cx onclick="CL()" aria-label="إغلاق">×</button><h3>بيانات الطلب</h3><div class=fm><input id=fn placeholder="الاسم *" maxlength=60 autocomplete=name value="${E(c.n)}"><input id=fp type=tel inputmode=tel placeholder="رقم الموبايل (اختياري)" maxlength=20 autocomplete=tel value="${E(c.p)}"><input id=ft placeholder="${E(M.w.l||'طاولة')} (اختياري)" maxlength=20 value="${E(TB||'')}"><textarea id=fo rows=2 maxlength=300 placeholder="ملاحظات على الطلب (اختياري)"></textarea></div><p id=fe style="color:#E0906A;min-height:22px;font-size:14px">${E(err||'')}</p><h3>الإجمالي: ${tot()} ج.م</h3><button class=ad id=fs style="width:100%;padding:12px" onclick="SB()">تأكيد وإرسال الطلب</button><button class="ad sc" style="width:100%;padding:12px;margin-top:8px" onclick="CS()">رجوع</button>`;$('#ov').hidden=false}
-function SB(){const e=$('#fe'),n=$('#fn').value.trim(),o=$('#fo').value.trim(),t=$('#ft').value.trim(),p=ND($('#fp').value).replace(/[\s\-()]/g,'');
-if(!n){e.textContent='اكتب اسمك';return}
-if(p&&!/^\+?\d{7,15}$/.test(p)){e.textContent='رقم الموبايل غير صحيح';return}
-if(!t&&!p){e.textContent='اكتب '+(M.w.l||'الطاولة')+' أو رقم موبايلك عشان نقدر نوصلك';return}
-let wl=0;try{wl=+localStorage.wl||0}catch(x){}if(Date.now()-wl<20000){e.textContent='استنى لحظات قبل ما تبعت طلب تاني';return}
-if(!cart.length)return;const d=DBI();if(!d){e.textContent='الإرسال المباشر مش متاح دلوقتي، ابعت واتساب';return}
+function SB(au){const A=!!au,F=m=>{if(A){CS();$('#sh').insertAdjacentHTML('beforeend','<p style="color:#E0906A;text-align:center;margin-top:8px">'+E(m)+'</p>')}else $('#fe').textContent=m},n=A?((M.w.l||'طاولة')+' '+TB).slice(0,60):$('#fn').value.trim(),o=A?'':$('#fo').value.trim(),t=A?String(TB).slice(0,20):$('#ft').value.trim(),p=A?'':ND($('#fp').value).replace(/[\s\-()]/g,'');
+if(!n){F('اكتب اسمك');return}
+if(p&&!/^\+?\d{7,15}$/.test(p)){F('رقم الموبايل غير صحيح');return}
+if(!t&&!p){F('اكتب '+(M.w.l||'الطاولة')+' أو رقم موبايلك عشان نقدر نوصلك');return}
+let wl=0;try{wl=+localStorage.wl||0}catch(x){}if(Date.now()-wl<20000){F('استنى لحظات قبل ما تبعت طلب تاني');return}
+if(!cart.length)return;const d=DBI();if(!d){F('الإرسال المباشر مش متاح دلوقتي، ابعت واتساب');return}
 const items=cart.map(x=>{const i={n:x.n,q:x.q,u:x.u};if(x.g)i.g=x.g;if(x.z)i.z=x.z;if(x.a.length)i.a=x.a.join('، ');return i});
 const od={ts:firebase.database.ServerValue.TIMESTAMP,status:'new',name:n,total:tot(),items};if(p)od.phone=p;if(t)od.table=t;if(o)od.note=o;
 const ref=d.ref('orders').push(),sent=cart.slice();
 try{localStorage.wl=Date.now();localStorage.wc=JSON.stringify({n,p})}catch(x){}
 WT(ref.key,0);TK();
-ref.set(od).then(()=>{OKD=1;sent.forEach(x=>d.ref('data/stats/'+x.id).transaction(v=>(v||0)+x.q));cart=[];CB();try{localStorage.wo=ref.key}catch(x){}TP();if($('#sh .tk'))TK()}).catch(er=>{LX();try{localStorage.wl=0}catch(x){}DF(/permission/i.test((er&&(er.message||er.code))||'')?'الإرسال المباشر لسه مش مفعّل، ابعت واتساب':'تعذر إرسال الطلب، حاول تاني أو ابعت واتساب')})}
+ref.set(od).then(()=>{OKD=1;sent.forEach(x=>d.ref('data/stats/'+x.id).transaction(v=>(v||0)+x.q));cart=[];CB();try{localStorage.wo=ref.key}catch(x){}TP();if($('#sh .tk'))TK()}).catch(er=>{LX();try{localStorage.wl=0}catch(x){}(A?F:DF)(/permission/i.test((er&&(er.message||er.code))||'')?'الإرسال المباشر لسه مش مفعّل، ابعت واتساب':'تعذر إرسال الطلب، حاول تاني أو ابعت واتساب')})}
+function DS(){TB?SB(1):DF()}
 function WT(id,ok){if(!DBI())return;if(LO&&LO.r)LO.r.off();OKD=ok;const r=db.ref('orders/'+id+'/status');LO={id,st:ok?null:'new',r};let f=1;
 r.on('value',s=>{const v=s.val();if(v===null){if(OKD)LX();return}if(f&&OKD&&(v=='done'||v=='cancelled')){f=0;LX();return}f=0;LO.st=v;TP();if($('#sh .tk')&&!$('#ov').hidden)TK()},()=>{})}
 function LX(){if(LO&&LO.r)LO.r.off();LO=null;OKD=0;TV=0;try{localStorage.removeItem('wo')}catch(e){}TP()}
