@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "data": {
+      ".read": true,
+      ".write": "auth != null",
+      "stats": {
+        "$id": {
+          ".write": true,
+          ".validate": "newData.isNumber()"
+        }
+      }
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".indexOn": ["ts"],
+      "$id": {
+        ".read": true,
+        ".write": "auth != null || (!data.exists() && newData.exists())",
+        ".validate": "newData.hasChildren(['ts','status','name','total','items'])",
+        "ts": { ".validate": "newData.isNumber() && (data.exists() || newData.val() == now)" },
+        "status": { ".validate": "newData.isString() && (auth != null || newData.val() == 'new') && (newData.val() == 'new' || newData.val() == 'preparing' || newData.val() == 'done' || newData.val() == 'cancelled')" },
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60" },
+        "phone": { ".validate": "newData.isString() && newData.val().matches(/^[+]?[0-9]{7,15}$/)" },
+        "table": { ".validate": "newData.isString() && newData.val().length <= 20" },
+        "note": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "total": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000" },
+        "items": {
+          ".validate": "newData.hasChildren()",
+          "$i": {
+            ".validate": "newData.hasChildren(['n','q','u'])",
+            "n": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
+            "g": { ".validate": "newData.isString() && newData.val().length <= 60" },
+            "z": { ".validate": "newData.isString() && newData.val().length <= 40" },
+            "a": { ".validate": "newData.isString() && newData.val().length <= 200" },
+            "q": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999" },
+            "u": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000" },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
